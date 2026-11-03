@@ -20,6 +20,7 @@ package cfgplugins
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"sort"
@@ -932,20 +933,61 @@ func ConfigureCiscoHardwareInit(t *testing.T, dut *ondatra.DUTDevice) bool {
 	return false
 }
 
+// getOperatingTcamProfile queries the switch for its current operating TCAM profile.
+// Returns the profile name (e.g. "vrf-selection-with-extended-hashing") or "default".
+func getOperatingTcamProfile(t *testing.T, dut *ondatra.DUTDevice) string {
+	t.Helper()
+	output := helpers.RunCliCommand(t, dut, "enable\nshow hardware tcam profile | json")
+	jsonStart := strings.IndexByte(output, '{')
+	jsonEnd := strings.LastIndexByte(output, '}')
+	if jsonStart < 0 || jsonEnd < jsonStart {
+		t.Logf("TCAM profile output did not contain JSON, assuming profile change needed: %q", output)
+		return ""
+	}
+	var result struct {
+		PmfProfiles map[string]struct {
+			Status string `json:"status"`
+		} `json:"pmfProfiles"`
+	}
+	if err := json.Unmarshal([]byte(output[jsonStart:jsonEnd+1]), &result); err != nil {
+		t.Logf("Failed to parse TCAM profile JSON, assuming profile change needed: %v", err)
+		return ""
+	}
+	for sliceName, profile := range result.PmfProfiles {
+		if strings.Contains(sliceName, "Linecard") ||
+			strings.Contains(sliceName, "FixedSystem") ||
+			strings.Contains(sliceName, "Switchcard") {
+			if profile.Status != "default" {
+				return profile.Status
+			}
+		}
+	}
+	return "default"
+}
+
 // ConfigureTcam pushes Arista-specific hardware init configs for TCAM to allocate enough space
 // for routes and optimize FIB and counters.
 func ConfigureTcam(t *testing.T, dut *ondatra.DUTDevice) bool {
 	t.Helper()
 	hardwareVrfCfg := NewDUTHardwareInit(t, dut, FeatureVrfSelectionExtended)
 	hardwarePfCfg := NewDUTHardwareInit(t, dut, FeatureOptimizeFIBAndCounters)
-	if hardwareVrfCfg != "" && hardwarePfCfg != "" {
-		PushDUTHardwareInitConfig(t, dut, hardwareVrfCfg)
-		PushDUTHardwareInitConfig(t, dut, hardwarePfCfg)
-		// Save the configurations before rebooting the chassis.
-		helpers.GnmiCLIConfig(t, dut, "write memory")
-		return true
+	if hardwareVrfCfg == "" || hardwarePfCfg == "" {
+		return false
 	}
-	return false
+
+	currentProfile := getOperatingTcamProfile(t, dut)
+	t.Logf("Current operating TCAM profile: %q", currentProfile)
+	if currentProfile == "vrf-selection-with-extended-hashing" {
+		t.Logf("TCAM profile already set to %q, skipping reboot", currentProfile)
+		PushDUTHardwareInitConfig(t, dut, hardwarePfCfg)
+		return false
+	}
+
+	PushDUTHardwareInitConfig(t, dut, hardwareVrfCfg)
+	PushDUTHardwareInitConfig(t, dut, hardwarePfCfg)
+	// Save the configurations before rebooting the chassis.
+	helpers.GnmiCLIConfig(t, dut, "write memory")
+	return true
 }
 
 // EnableSecondaryDefaultLookup pushes Nokia specific hardware configuration to enable secondary
