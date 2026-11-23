@@ -468,15 +468,18 @@ func WaitForReboot(t *testing.T, dut *ondatra.DUTDevice, alreadyDown bool) gnoig
 				t.Logf("Time elapsed %.0f seconds, GNMI dial failed: %v", time.Since(startReboot).Seconds(), dialErr)
 				continue
 			}
+			// Devices can serve gNMI reads before they accept config, so also
+			// require a no-op config write to succeed.
 			errMsg := testt.CaptureFatal(t, func(t testing.TB) {
-				gnmi.Get(t, dut, gnmi.OC().System().CurrentDatetime().State())
+				hostname := gnmi.Get(t, dut, gnmi.OC().System().Hostname().State())
+				gnmi.Replace(t, dut, gnmi.OC().System().Hostname().Config(), hostname)
 			})
 			if errMsg != nil {
 				if !deviceWentDown {
 					t.Log("Device is now unreachable. Waiting for it to come back up.")
 					deviceWentDown = true
 				}
-				t.Logf("Time elapsed %.0f seconds, DUT not reachable yet.", time.Since(startReboot).Seconds())
+				t.Logf("Time elapsed %.0f seconds, DUT not ready yet: %s", time.Since(startReboot).Seconds(), *errMsg)
 			} else {
 				if deviceWentDown {
 					t.Logf("Device rebooted successfully. Boot time: %.0f seconds.", time.Since(startReboot).Seconds())
