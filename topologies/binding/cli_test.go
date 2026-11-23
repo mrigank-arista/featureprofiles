@@ -157,7 +157,9 @@ func (f *cliFixture) start(t testing.TB) error {
 		return fmt.Errorf("handshake errors: %v; and %v", err1, err2)
 	}
 
-	cli, err := newCLI(client)
+	cli, err := newCLI(client, func() (*ssh.Client, error) {
+		return nil, errors.New("cliFixture supports a single connection")
+	})
 	if err != nil {
 		return err
 	}
@@ -284,5 +286,36 @@ func TestCLI(t *testing.T) {
 	want := []string{"exec command: xyzzy", "exec stderr", ""}
 	if diff := cmp.Diff(want, got, cmpSortStrings); diff != "" {
 		t.Errorf("Command output -want, +got:\n%s", diff)
+	}
+}
+
+func TestCLIConnectionPerCommand(t *testing.T) {
+	f := &cliFixture{}
+	if err := f.start(t); err != nil {
+		t.Fatalf("Could not start cliFixture: %v", err)
+	}
+	first := f.cli.first
+	dials := 0
+	dialErr := errors.New("dial error")
+	f.cli.dial = func() (*ssh.Client, error) {
+		dials++
+		return nil, dialErr
+	}
+
+	if _, err := f.cli.RunCommand(context.Background(), "xyzzy"); err != nil {
+		t.Fatalf("First RunCommand() got error: %v", err)
+	}
+	if _, _, err := first.SendRequest("keepalive@openssh.com", true, nil); err == nil {
+		t.Errorf("Connection is still open after the first command")
+	}
+	if dials != 0 {
+		t.Errorf("First command dialed %d connections, want 0", dials)
+	}
+
+	if _, err := f.cli.RunCommand(context.Background(), "xyzzy"); !errors.Is(err, dialErr) {
+		t.Errorf("Second RunCommand() got error %v, want %v", err, dialErr)
+	}
+	if dials != 1 {
+		t.Errorf("Second command dialed %d connections, want 1", dials)
 	}
 }

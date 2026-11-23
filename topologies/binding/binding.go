@@ -296,18 +296,21 @@ func (d *staticDUT) DialGRPCWithPort(ctx context.Context, port int, opts ...grpc
 
 func (d *staticDUT) DialCLI(context.Context) (binding.CLIClient, error) {
 	sshOpts := d.r.ssh(d.dev)
-	config := &ssh.ClientConfig{
-		User: sshOpts.Username,
-		Auth: []ssh.AuthMethod{
-			ssh.Password(sshOpts.Password),
-			ssh.KeyboardInteractive(sshInteractive(sshOpts.Password)),
-		},
+	dial := func() (*ssh.Client, error) {
+		config := &ssh.ClientConfig{
+			User: sshOpts.Username,
+			Auth: []ssh.AuthMethod{
+				ssh.Password(sshOpts.Password),
+				ssh.KeyboardInteractive(sshInteractive(sshOpts.Password)),
+			},
+		}
+		return createSSHClient(config, sshOpts)
 	}
-	sc, err := createSSHClient(config, sshOpts)
+	sc, err := dial()
 	if err != nil {
 		return nil, err
 	}
-	return newCLI(sc)
+	return newCLI(sc, dial)
 }
 
 func (d *staticDUT) DialSSH(_ context.Context, sshAuth binding.SSHAuth) (binding.SSHClient, error) {
