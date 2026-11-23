@@ -24,6 +24,7 @@ import (
 
 	"github.com/open-traffic-generator/snappi/gosnappi"
 	"github.com/openconfig/featureprofiles/internal/args"
+	"github.com/openconfig/featureprofiles/internal/cfgplugins"
 	"github.com/openconfig/featureprofiles/internal/components"
 	"github.com/openconfig/featureprofiles/internal/deviations"
 	"github.com/openconfig/featureprofiles/internal/fptest"
@@ -116,9 +117,8 @@ func TestMain(m *testing.M) {
 //
 // Test notes:
 //
-//  - P4RT needs to be configired and enabled during the binding.
-//      p4-runtime
-//        no shutdown
+//  - The P4RT tests enable the P4RT server with cfgplugins.ConfigureP4RTServer
+//    on devices that require vendor pre-configuration.
 //
 //  Sample CLI command to get telemetry using gmic:
 //   - gnmic -a ipaddr:10162 -u username -p password --skip-verify get \
@@ -829,6 +829,7 @@ func TestLacpMember(t *testing.T) {
 
 func TestP4rtInterfaceID(t *testing.T) {
 	dut := ondatra.DUT(t, "dut")
+	cfgplugins.ConfigureP4RTServer(t, dut)
 	dp := dut.Port(t, "port1")
 	d := &oc.Root{}
 	i := d.GetOrCreateInterface(dp.Name())
@@ -877,6 +878,7 @@ func TestP4rtInterfaceID(t *testing.T) {
 func TestP4rtNodeID(t *testing.T) {
 	// TODO: add p4rtNodeName to Ondatra's netutil
 	dut := ondatra.DUT(t, "dut")
+	cfgplugins.ConfigureP4RTServer(t, dut)
 	d := &oc.Root{}
 	nodes := P4RTNodesByPort(t, dut)
 	ic := d.GetOrCreateComponent(nodes["port1"]).GetOrCreateIntegratedCircuit()

@@ -182,6 +182,7 @@ func setupEnvironment(t *testing.T) *testEnv {
 	if lcs := components.FindComponentsByType(t, dut, oc.PlatformTypes_OPENCONFIG_HARDWARE_COMPONENT_LINECARD); len(lcs) < 2 {
 		t.Skipf("Test requires a modular (MFF) DUT with at least two linecards, found %d: %v", len(lcs), lcs)
 	}
+	cfgplugins.ConfigureP4RTServer(t, dut)
 
 	// Test environment setup: select two interfaces on different integrated
 	// circuits whose parent linecards are also different, so that disabling

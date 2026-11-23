@@ -12,5 +12,6 @@ platform_exceptions: {
   }
   deviations: {
     p4rt_unsetelectionid_primary_allowed: true
+    vendor_pre_config_required: true
   }
 }

@@ -5,3 +5,11 @@ uuid:  "c755648a-f797-4c3c-985f-09c5f04238d4"
 plan_id:  "Certz-4"
 description:  "Trust Bundle"
 testbed:  TESTBED_DUT_ATE_2LINKS
+platform_exceptions: {
+  platform: {
+    vendor: ARISTA
+  }
+  deviations: {
+    vendor_pre_config_required: true
+  }
+}

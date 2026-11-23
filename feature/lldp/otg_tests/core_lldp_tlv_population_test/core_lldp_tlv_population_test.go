@@ -360,6 +360,9 @@ func disableP4RTLLDP(t *testing.T, dut *ondatra.DUTDevice) {
 	t.Helper()
 	switch dut.Vendor() {
 	case ondatra.ARISTA:
+		if !aristaP4RTEnabled(t, dut) {
+			return
+		}
 		t.Cleanup(func() {
 			enableCLI := `p4-runtime
 					no shutdown`
@@ -375,6 +378,28 @@ func disableP4RTLLDP(t *testing.T, dut *ondatra.DUTDevice) {
 			t.Fatalf("Failed to disable P4RTLLDP: %v", err)
 		}
 	}
+}
+
+// aristaP4RTEnabled reports whether the p4-runtime server is administratively enabled.
+func aristaP4RTEnabled(t *testing.T, dut *ondatra.DUTDevice) bool {
+	t.Helper()
+	resp, err := dut.RawAPIs().GNMI(t).Get(context.Background(), &gpb.GetRequest{
+		Path:     []*gpb.Path{{Origin: "cli", Elem: []*gpb.PathElem{{Name: "show running-config section p4-runtime"}}}},
+		Encoding: gpb.Encoding_ASCII,
+	})
+	if err != nil {
+		t.Fatalf("Failed to get p4-runtime running-config: %v", err)
+	}
+	for _, n := range resp.GetNotification() {
+		for _, u := range n.GetUpdate() {
+			for _, line := range strings.Split(u.GetVal().GetAsciiVal(), "\n") {
+				if strings.TrimSpace(line) == "no shutdown" {
+					return true
+				}
+			}
+		}
+	}
+	return false
 }
 
 func cliSetRequest(config string) *gpb.SetRequest {

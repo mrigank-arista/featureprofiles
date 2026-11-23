@@ -30,6 +30,7 @@ import (
 	"github.com/google/gopacket/layers"
 	"github.com/open-traffic-generator/snappi/gosnappi"
 	"github.com/openconfig/featureprofiles/internal/attrs"
+	"github.com/openconfig/featureprofiles/internal/cfgplugins"
 	"github.com/openconfig/featureprofiles/internal/deviations"
 	"github.com/openconfig/featureprofiles/internal/fptest"
 	"github.com/openconfig/featureprofiles/internal/otgutils"
@@ -231,6 +232,7 @@ func getTracerouteParameter(t *testing.T) PacketIO {
 func TestPacketOut(t *testing.T) {
 	ctx := context.Background()
 	dut := ondatra.DUT(t, "dut")
+	cfgplugins.ConfigureP4RTServer(t, dut)
 	configureDUT(t, dut)
 
 	configureDeviceID(ctx, t, dut)

@@ -45,6 +45,7 @@ platform_exceptions: {
   deviations: {
     interface_enabled: true
     default_network_instance: "default"
+    vendor_pre_config_required: true
   }
 }
 platform_exceptions: {
@@ -56,5 +57,6 @@ platform_exceptions: {
     interface_enabled: true
     default_network_instance: "default"
     os_component_parent_is_chassis: true
+    vendor_pre_config_required: true
   }
 }

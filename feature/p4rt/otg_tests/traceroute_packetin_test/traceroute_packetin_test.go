@@ -26,6 +26,7 @@ import (
 	"github.com/cisco-open/go-p4/utils"
 	"github.com/open-traffic-generator/snappi/gosnappi"
 	"github.com/openconfig/featureprofiles/internal/attrs"
+	"github.com/openconfig/featureprofiles/internal/cfgplugins"
 	"github.com/openconfig/featureprofiles/internal/deviations"
 	"github.com/openconfig/featureprofiles/internal/fptest"
 	"github.com/openconfig/featureprofiles/internal/otgutils"
@@ -380,6 +381,7 @@ func testPacketInAfterClientReconnection(ctx context.Context, t *testing.T, dut 
 
 func TestPacketIn(t *testing.T) {
 	dut := ondatra.DUT(t, "dut")
+	cfgplugins.ConfigureP4RTServer(t, dut)
 	ctx := t.Context()
 
 	// Configure the DUT

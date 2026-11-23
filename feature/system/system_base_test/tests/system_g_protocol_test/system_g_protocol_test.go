@@ -21,6 +21,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/openconfig/featureprofiles/internal/cfgplugins"
 	"github.com/openconfig/featureprofiles/internal/deviations"
 	"github.com/openconfig/featureprofiles/internal/fptest"
 	"github.com/openconfig/ondatra"
@@ -142,6 +143,7 @@ func TestGRIBIClient(t *testing.T) {
 // TestP4RTClient validates that the DUT listens on standard P4RT Port.
 func TestP4RTClient(t *testing.T) {
 	dut := ondatra.DUT(t, "dut")
+	cfgplugins.ConfigureP4RTServer(t, dut)
 	conn := dialConn(t, dut, introspect.P4RT, 9559, false)
 	c := p4rtpb.NewP4RuntimeClient(conn)
 	if deviations.P4RTCapabilitiesUnsupported(dut) {

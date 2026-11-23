@@ -5,3 +5,11 @@ uuid:  "0ced37e8-9765-4ed1-8a55-06819d6ee95c"
 plan_id:  "Certz-2"
 description:  "Server Certificate"
 testbed:  TESTBED_DUT_ATE_2LINKS
+platform_exceptions: {
+  platform: {
+    vendor: ARISTA
+  }
+  deviations: {
+    vendor_pre_config_required: true
+  }
+}

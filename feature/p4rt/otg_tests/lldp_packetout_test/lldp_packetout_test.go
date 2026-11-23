@@ -31,6 +31,7 @@ import (
 	"github.com/google/gopacket/layers"
 	"github.com/open-traffic-generator/snappi/gosnappi"
 	"github.com/openconfig/featureprofiles/internal/attrs"
+	"github.com/openconfig/featureprofiles/internal/cfgplugins"
 	"github.com/openconfig/featureprofiles/internal/deviations"
 	"github.com/openconfig/featureprofiles/internal/fptest"
 	"github.com/openconfig/featureprofiles/internal/p4rtutils"
@@ -350,6 +351,7 @@ func getLLDPParameter(t *testing.T) PacketIO {
 
 func TestPacketOut(t *testing.T) {
 	dut := ondatra.DUT(t, "dut")
+	cfgplugins.ConfigureP4RTServer(t, dut)
 	ctx := context.Background()
 
 	configureDUT(t, dut)

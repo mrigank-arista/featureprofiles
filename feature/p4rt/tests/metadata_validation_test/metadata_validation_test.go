@@ -8,6 +8,7 @@ import (
 
 	"github.com/cisco-open/go-p4/p4rt_client"
 	"github.com/cisco-open/go-p4/utils"
+	"github.com/openconfig/featureprofiles/internal/cfgplugins"
 	"github.com/openconfig/featureprofiles/internal/deviations"
 	"github.com/openconfig/featureprofiles/internal/fptest"
 	"github.com/openconfig/featureprofiles/internal/p4rtutils"
@@ -35,6 +36,7 @@ func TestMain(m *testing.M) {
 
 func TestP4RTMetadata(t *testing.T) {
 	dut := ondatra.DUT(t, "dut")
+	cfgplugins.ConfigureP4RTServer(t, dut)
 	configureDeviceID(t, dut)
 	configurePortID(t, dut)
 

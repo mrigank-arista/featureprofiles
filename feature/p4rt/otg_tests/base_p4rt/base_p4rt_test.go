@@ -27,6 +27,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/open-traffic-generator/snappi/gosnappi"
 	"github.com/openconfig/featureprofiles/internal/attrs"
+	"github.com/openconfig/featureprofiles/internal/cfgplugins"
 	"github.com/openconfig/featureprofiles/internal/deviations"
 	"github.com/openconfig/featureprofiles/internal/fptest"
 	"github.com/openconfig/featureprofiles/internal/p4rtutils"
@@ -290,6 +291,7 @@ func verifyReadReceiveMatch(t *testing.T, expected_table *p4_v1.Update, received
 func TestP4rtConnect(t *testing.T) {
 
 	dut := ondatra.DUT(t, "dut")
+	cfgplugins.ConfigureP4RTServer(t, dut)
 	ctx := context.Background()
 	ate := ondatra.ATE(t, "ate")
 

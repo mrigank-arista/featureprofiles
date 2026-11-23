@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/openconfig/featureprofiles/feature/gnsi/certz/tests/internal/setup_service"
+	"github.com/openconfig/featureprofiles/internal/cfgplugins"
 	"github.com/openconfig/featureprofiles/internal/fptest"
 	authzpb "github.com/openconfig/gnsi/authz"
 	certzpb "github.com/openconfig/gnsi/certz"
@@ -171,6 +172,7 @@ func CertzRotateNegative(ctx context.Context, t *testing.T, certzClient certzpb.
 
 func TestTrustBundleRotation(t *testing.T) {
 	dut := ondatra.DUT(t, "dut")
+	cfgplugins.ConfigureP4RTServer(t, dut)
 	serverAddr = dut.Name()
 	if err := binding.DUTAs(dut.RawAPIs().BindingDUT(), &creds); err != nil {
 		t.Fatalf("Failed to get DUT credentials: %v", err)

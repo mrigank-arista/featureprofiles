@@ -32,6 +32,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/openconfig/featureprofiles/internal/cfgplugins"
 	"github.com/openconfig/featureprofiles/internal/fptest"
 	acctzlib "github.com/openconfig/featureprofiles/internal/security/acctz"
 	gnmipb "github.com/openconfig/gnmi/proto/gnmi"
@@ -228,6 +229,7 @@ type testCase struct {
 // all per-transaction gRPC services discovered from the DUT binding.
 func TestAccountingAuthenFailUni(t *testing.T) {
 	dut := ondatra.DUT(t, "dut")
+	cfgplugins.ConfigureP4RTServer(t, dut)
 
 	serviceTable = buildServiceTable(t, dut)
 

@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/openconfig/featureprofiles/feature/gnsi/certz/tests/internal/setup_service"
+	"github.com/openconfig/featureprofiles/internal/cfgplugins"
 	"github.com/openconfig/featureprofiles/internal/fptest"
 	"github.com/openconfig/gnmi/proto/gnmi"
 	certzpb "github.com/openconfig/gnsi/certz"
@@ -89,6 +90,7 @@ func verifyServices(t *testing.T, caCert *x509.CertPool, expectedResult bool, sa
 func TestTrustBundleCert(t *testing.T) {
 
 	dut := ondatra.DUT(t, "dut")
+	cfgplugins.ConfigureP4RTServer(t, dut)
 	serverAddr = dut.Name() //returns the device name.
 	if err := binding.DUTAs(dut.RawAPIs().BindingDUT(), &creds); err != nil {
 		t.Fatalf("STATUS:Failed to get DUT credentials using binding.DUTAs: %v. The binding for %s must implement the DUTCredentialer interface.", err, dut.Name())

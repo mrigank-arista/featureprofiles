@@ -22,6 +22,7 @@ platform_exceptions: {
     interface_enabled: true
     default_network_instance: "default"
     oper_status_for_ic_unsupported: true
+    vendor_pre_config_required: true
   }
 }
 platform_exceptions: {

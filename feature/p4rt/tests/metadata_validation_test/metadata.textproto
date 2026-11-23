@@ -13,3 +13,11 @@ platform_exceptions: {
     p4rt_modify_table_entry_unsupported: true
   }
 }
+platform_exceptions: {
+  platform: {
+    vendor: ARISTA
+  }
+  deviations: {
+    vendor_pre_config_required: true
+  }
+}

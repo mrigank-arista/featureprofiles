@@ -21,6 +21,7 @@ import (
 
 	"github.com/open-traffic-generator/snappi/gosnappi"
 	"github.com/openconfig/featureprofiles/internal/attrs"
+	"github.com/openconfig/featureprofiles/internal/cfgplugins"
 	"github.com/openconfig/featureprofiles/internal/deviations"
 	"github.com/openconfig/featureprofiles/internal/fptest"
 	"github.com/openconfig/featureprofiles/internal/gnoi"
@@ -281,6 +282,7 @@ func subscribeOnChangeInterfaceName(t *testing.T, dut *ondatra.DUTDevice, p *ond
 
 func TestP4RTDaemonFailure(t *testing.T) {
 	dut := ondatra.DUT(t, "dut")
+	cfgplugins.ConfigureP4RTServer(t, dut)
 
 	t.Logf("Configure DUT")
 	configureDUT(t, dut)

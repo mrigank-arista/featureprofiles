@@ -1156,6 +1156,7 @@ func testTunnelTrafficDecapEncap(ctx context.Context, t *testing.T, dut *ondatra
 func TestTraceRoute(t *testing.T) {
 	ctx := context.Background()
 	dut := ondatra.DUT(t, "dut")
+	cfgplugins.ConfigureP4RTServer(t, dut)
 	ate := ondatra.ATE(t, "ate")
 	otg := ate.OTG()
 	gribic := dut.RawAPIs().GRIBI(t)

@@ -34,5 +34,6 @@ platform_exceptions: {
     gribi_aaa_role_based_authz_unsupported: true
     p4rt_aaa_role_based_authz_unsupported: true
     p4rt_capabilities_unsupported: true
+    vendor_pre_config_required: true
   }
 }

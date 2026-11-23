@@ -10,6 +10,7 @@ import (
 
 	"github.com/cisco-open/go-p4/p4rt_client"
 	"github.com/cisco-open/go-p4/utils"
+	"github.com/openconfig/featureprofiles/internal/cfgplugins"
 	"github.com/openconfig/featureprofiles/internal/deviations"
 	"github.com/openconfig/featureprofiles/internal/fptest"
 	"github.com/openconfig/featureprofiles/internal/p4rtutils"
@@ -330,6 +331,7 @@ func removeClient(handle *p4rt_client.P4RTClient) {
 // Both clients should be able to connect as secondary
 func TestUnsetElectionid(t *testing.T) {
 	dut := ondatra.DUT(t, "dut")
+	cfgplugins.ConfigureP4RTServer(t, dut)
 	configureDeviceID(t, dut)
 	configurePortID(t, dut)
 	clients := []testArgs{
@@ -437,6 +439,7 @@ func TestUnsetElectionid(t *testing.T) {
 // Test Primary Reconnect
 func TestPrimaryReconnect(t *testing.T) {
 	dut := ondatra.DUT(t, "dut")
+	cfgplugins.ConfigureP4RTServer(t, dut)
 	configureDeviceID(t, dut)
 	configurePortID(t, dut)
 	testCases := []testArgs{
@@ -493,6 +496,7 @@ func TestPrimaryReconnect(t *testing.T) {
 // // Test Primary/Secondary clients
 func TestPrimarySecondary(t *testing.T) {
 	dut := ondatra.DUT(t, "dut")
+	cfgplugins.ConfigureP4RTServer(t, dut)
 	configureDeviceID(t, dut)
 	configurePortID(t, dut)
 	testCases := []testArgs{
@@ -545,6 +549,7 @@ func TestPrimarySecondary(t *testing.T) {
 // // Test Duplicate ElectionID
 func TestDuplicateElectionID(t *testing.T) {
 	dut := ondatra.DUT(t, "dut")
+	cfgplugins.ConfigureP4RTServer(t, dut)
 	configureDeviceID(t, dut)
 	configurePortID(t, dut)
 	testCases := []testArgs{
@@ -596,6 +601,7 @@ func TestDuplicateElectionID(t *testing.T) {
 
 func TestReplacePrimary(t *testing.T) {
 	dut := ondatra.DUT(t, "dut")
+	cfgplugins.ConfigureP4RTServer(t, dut)
 	configureDeviceID(t, dut)
 	configurePortID(t, dut)
 	testCases := []mcTestArgs{
@@ -686,6 +692,7 @@ func TestReplacePrimary(t *testing.T) {
 // // Test arbitration update from same client
 func TestArbitrationUpdate(t *testing.T) {
 	dut := ondatra.DUT(t, "dut")
+	cfgplugins.ConfigureP4RTServer(t, dut)
 	configureDeviceID(t, dut)
 	configurePortID(t, dut)
 	test := testArgs{

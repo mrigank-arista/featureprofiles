@@ -31,6 +31,7 @@ import (
 	"time"
 
 	"github.com/openconfig/featureprofiles/internal/args"
+	"github.com/openconfig/featureprofiles/internal/cfgplugins"
 	"github.com/openconfig/featureprofiles/internal/deviations"
 	"github.com/openconfig/featureprofiles/internal/helpers"
 	bindpb "github.com/openconfig/featureprofiles/topologies/proto/binding"
@@ -1321,40 +1322,7 @@ func SendP4rtRPCs(t *testing.T, dut *ondatra.DUTDevice) []*acctzpb.RecordRespons
 	// so while the test asks for v4 and v6 we'll just be doing it for whatever we get.
 	// target := getGrpcTarget(t, dut, introspect.P4RT)
 
-	// configure P4runtime
-	switch dut.Vendor() {
-	case ondatra.ARISTA:
-		p4rtConfig := "p4-runtime\n transport grpc p4-foo\n ssl profile SELFSIGNED\n vrf mgmt\n no shutdown"
-		helpers.GnmiCLIConfig(t, dut, p4rtConfig)
-		gnmiClient := dut.RawAPIs().GNMI(t)
-		deadline := time.Now().Add(2 * time.Minute)
-		p4rtUp := false
-		for !p4rtUp && time.Now().Before(deadline) {
-			resp, err := gnmiClient.Get(context.Background(), &gnmipb.GetRequest{
-				Path: []*gnmipb.Path{{
-					Origin: "cli",
-					Elem:   []*gnmipb.PathElem{{Name: "show p4-runtime"}},
-				}},
-				Encoding: gnmipb.Encoding_ASCII,
-			})
-			if err == nil {
-				for _, notif := range resp.GetNotification() {
-					for _, update := range notif.GetUpdate() {
-						if strings.Contains(update.GetVal().GetAsciiVal(), "Server: running on port") {
-							p4rtUp = true
-						}
-					}
-				}
-			}
-			if !p4rtUp {
-				time.Sleep(5 * time.Second)
-			}
-		}
-		if !p4rtUp {
-			t.Fatalf("P4Runtime agent did not start within timeout")
-		}
-		t.Log("P4Runtime agent is up and running")
-	}
+	cfgplugins.ConfigureP4RTServer(t, dut)
 	var records []*acctzpb.RecordResponse
 	// grpcConn := dialGrpc(t, target)
 	userKey, passKey := getMetadataKeys(dut)
